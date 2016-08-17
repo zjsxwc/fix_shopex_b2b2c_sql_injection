@@ -24,7 +24,7 @@ class sysitem_search_item  {
             ->from($this->itemTable, $itemTableAlias)
             ->leftJoin($itemTableAlias, $this->itemStatustable, $itemTableStatusAlias, "{$itemTableAlias}.item_id={$itemTableStatusAlias}.item_id")
             ->where($whereSql)
-            ->setParameters($this->objMdlItem->_dbeav_filter->getPrepareParamMarkedValues())
+            ->setParameters($this->objMdlItem->dbeav_filter->getPrepareParamMarkedValues())
             ->execute()->fetchColumn();
     }
 
@@ -91,7 +91,7 @@ class sysitem_search_item  {
             ->leftJoin($itemTableAlias, $this->itemStatustable, $itemTableStatusAlias, "{$itemTableAlias}.item_id={$itemTableStatusAlias}.item_id")
             ->leftJoin($itemTableAlias, $this->itemCountTable, $itemTableCountAlias, "{$itemTableAlias}.item_id={$itemTableCountAlias}.item_id")
             ->where($whereSql)
-            ->setParameters($this->objMdlItem->_dbeav_filter->getPrepareParamMarkedValues());
+            ->setParameters($this->objMdlItem->dbeav_filter->getPrepareParamMarkedValues());
 
         empty($groupBy) ?: $qb->groupBy($groupBy);
 

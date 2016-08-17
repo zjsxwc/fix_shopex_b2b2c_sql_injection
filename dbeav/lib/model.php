@@ -38,7 +38,7 @@ class dbeav_model extends base_db_model
     {
         $total = $this->database()->createQueryBuilder()
             ->select('count(*) as _count')->from($this->table_name(true))->where($this->_filter($filter))
-            ->setParameters($this->_dbeav_filter->getPrepareParamMarkedValues())
+            ->setParameters($this->dbeav_filter->getPrepareParamMarkedValues())
             ->execute()->fetchColumn();
 
         return $total;
@@ -74,7 +74,7 @@ class dbeav_model extends base_db_model
             }, explode(',', $orderBy));
         }
 
-        $qb->setParameters($this->_dbeav_filter->getPrepareParamMarkedValues());
+        $qb->setParameters($this->dbeav_filter->getPrepareParamMarkedValues());
         $stmt = $qb->execute();
         $data = $stmt->fetchAll();
         //执行的sql
@@ -95,7 +95,7 @@ class dbeav_model extends base_db_model
     }
 
     /** @var null|dbeav_filter */
-    public $_dbeav_filter = null;
+    public $dbeav_filter = null;
 
     /**
      * filter
@@ -108,7 +108,7 @@ class dbeav_model extends base_db_model
     function _filter($filter = array()){
         if ($filter == null) $filter = array();
 
-        $dbeav_filter = $this->_dbeav_filter = new dbeav_filter();
+        $dbeav_filter = $this->dbeav_filter = new dbeav_filter();
         $dbeav_filter_ret = $dbeav_filter->dbeav_filter_parser($filter,$this);
         return $dbeav_filter_ret;
     }

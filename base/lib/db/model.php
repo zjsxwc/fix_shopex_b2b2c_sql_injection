@@ -278,7 +278,7 @@ abstract class base_db_model implements base_interface_model
         $qb = $this->database()->createQueryBuilder();
         $qb->delete($this->database()->quoteIdentifier($this->table_name(1)))
            ->where($this->_filter($filter))
-           ->setParameters($this->_dbeav_filter->getPrepareParamMarkedValues());
+           ->setParameters($this->dbeav_filter->getPrepareParamMarkedValues());
 
         return $qb->execute() ? true : false;
     }
@@ -296,7 +296,7 @@ abstract class base_db_model implements base_interface_model
         $qb = $this->database()->createQueryBuilder();
         $qb->update($this->database()->quoteIdentifier($this->table_name(1)))
            ->where($this->_filter($filter))
-            ->setParameters($this->_dbeav_filter->getPrepareParamMarkedValues());
+            ->setParameters($this->dbeav_filter->getPrepareParamMarkedValues());
 
         array_walk($prepareUpdateData, function($value, $key) use (&$qb) {
             $qb->set($key, $qb->createPositionalParameter($value));

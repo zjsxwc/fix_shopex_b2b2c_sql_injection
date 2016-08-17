@@ -56,18 +56,18 @@ class dbeav_filter
     /**
      * @var int
      */
-    private $prepareParamMarkId = 0;
+    private $_prepare_param_mark_id = 0;
     /**
      * @var array
      */
-    public  $prepareParamMarkedValues = [];
+    private  $_prepare_param_marked_values = [];
 
     /**
      * @return array
      */
     public function getPrepareParamMarkedValues()
     {
-        return $this->prepareParamMarkedValues;
+        return $this->_prepare_param_marked_values;
     }
 
     /**
@@ -77,17 +77,17 @@ class dbeav_filter
     private function pickPrepareParamMark($value)
     {
         if (!is_array($value)) {
-            $this->prepareParamMarkId++;
-            $mark = ':ppm' . $this->prepareParamMarkId;
-            $this->prepareParamMarkedValues[$mark] = $value;
+            $this->_prepare_param_mark_id++;
+            $mark = ':ppm' . $this->_prepare_param_mark_id;
+            $this->_prepare_param_marked_values[$mark] = $value;
             return $mark;
         } else {
             $marks = [];
             $values = $value;
             foreach ($values as $v) {
-                $this->prepareParamMarkId++;
-                $mark = ':ppm' . $this->prepareParamMarkId;
-                $this->prepareParamMarkedValues[$mark] = $v;
+                $this->_prepare_param_mark_id++;
+                $mark = ':ppm' . $this->_prepare_param_mark_id;
+                $this->_prepare_param_marked_values[$mark] = $v;
 
                 $marks[] = $mark;
             }
@@ -148,7 +148,7 @@ class dbeav_filter
                                          $qb->expr()->lt($columnName, $filterPrepareMark[1]));
                 break;
             case 'in':
-                $filterPrepareMark = (array)$filterPrepareMark;//if(count($filterValue) == 9){$lk = debug_backtrace();dump($lk);dump($filterValue);die;}
+                $filterPrepareMark = (array)$filterPrepareMark;
                 if (empty($filterPrepareMark)) throw new InvalidArgumentException("filter column:{$columnName} in type, cannot empty");
                 $sql = $qb->expr()->in($columnName, $filterPrepareMark);
                 break;
