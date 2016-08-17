@@ -453,7 +453,7 @@ class dbeav_model extends base_db_model
                 $basePath = $this->convertPath($subSdfKey);
                 if ($this->has_one[$subSdfKey])
                 {
-                    if ($aIdArray = $this->getRow(implode(',',(array)$relatedModel->idColumn), $relatedFilter, $orderby))
+                    if ($aIdArray = $this->getRow(implode(',',(array)$relatedModel->idColumn), $relatedFilter))
                     {
                         $subDump = $relatedModel->dump($aIdArray,$relatedField,$relatedSubSdf);
                         array_set($redata, $basePath, $subDump);
