@@ -175,7 +175,7 @@ class sysitem_search_item  {
         {
             foreach($filter['shop_cat_id'] as $key=>$value)
             {
-                if (strlen($value) > 5) {
+                if (strlen($value) > 8) {
                     throw new \Exception('shop_cat_id value length too long,'.$value);
                 }
                 $shopCatWhere[] = " (shop_cat_id like '%".$value."%')";

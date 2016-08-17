@@ -133,7 +133,7 @@ abstract class base_db_model implements base_interface_model
         {
             $return = $this->update($data, $filter);
         }
-        return $retuen;
+        return $return;
     }
 
     private function prepareUpdateData($data)
@@ -236,6 +236,7 @@ abstract class base_db_model implements base_interface_model
     {
         $this->checkInsertData($data);
         $prepareUpdateData = $this->prepareInsertData($data);
+        /** @var \Doctrine\DBAL\Query\QueryBuilder $qb */
         $qb = $this->database()->createQueryBuilder();
 
         $qb->insert($this->database()->quoteIdentifier($this->table_name(1)));
@@ -293,6 +294,7 @@ abstract class base_db_model implements base_interface_model
     {
         if (count((array)$data)==0) return true;
         $prepareUpdateData = $this->prepareUpdateData($data);
+        /** @var \Doctrine\DBAL\Query\QueryBuilder $qb */
         $qb = $this->database()->createQueryBuilder();
         $qb->update($this->database()->quoteIdentifier($this->table_name(1)))
            ->where($this->_filter($filter))
