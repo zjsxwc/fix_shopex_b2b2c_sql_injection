@@ -132,16 +132,20 @@ class dbeav_filter
                 $sql = $qb->expr()->gte($columnName, $filterPrepareMark);
                 break;
             case 'has':
-                $sql = $qb->expr()->like($columnName, '%'.$filterPrepareMark.'%');
+                $this->_prepare_param_marked_values[$filterPrepareMark] = '%' . $this->_prepare_param_marked_values[$filterPrepareMark] . '%';
+                $sql = $qb->expr()->like($columnName, $filterPrepareMark);
                 break;
             case 'head':
-                $sql = $qb->expr()->like($columnName, $filterPrepareMark.'%');
+                $this->_prepare_param_marked_values[$filterPrepareMark] = $this->_prepare_param_marked_values[$filterPrepareMark] . '%';
+                $sql = $qb->expr()->like($columnName, $filterPrepareMark);
                 break;
             case 'foot':
-                $sql = $qb->expr()->like($columnName, '%'.$filterPrepareMark);
+                $this->_prepare_param_marked_values[$filterPrepareMark] = '%' . $this->_prepare_param_marked_values[$filterPrepareMark];
+                $sql = $qb->expr()->like($columnName, $filterPrepareMark);
                 break;
             case 'nohas':
-                $sql = $qb->expr()->notlike($columnName, '%'.$filterPrepareMark.'%');
+                $this->_prepare_param_marked_values[$filterPrepareMark] = '%' . $this->_prepare_param_marked_values[$filterPrepareMark] . '%';
+                $sql = $qb->expr()->notlike($columnName, $filterPrepareMark);
                 break;
             case 'between':
                 $sql = $qb->expr()->andX($qb->expr()->gte($columnName, $filterPrepareMark[0]),
