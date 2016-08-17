@@ -52,61 +52,109 @@ class dbeav_filter
         return call_user_func_array(array($qb->expr(), 'andX'), $where);
     }
 
+
+    /**
+     * @var int
+     */
+    private $prepareParamMarkId = 0;
+    /**
+     * @var array
+     */
+    public  $prepareParamMarkedValues = [];
+
+    /**
+     * @return array
+     */
+    public function getPrepareParamMarkedValues()
+    {
+        return $this->prepareParamMarkedValues;
+    }
+
+    /**
+     * @param $value
+     * @return array|string
+     */
+    private function pickPrepareParamMark($value)
+    {
+        if (!is_array($value)) {
+            $this->prepareParamMarkId++;
+            $mark = ':ppm' . $this->prepareParamMarkId;
+            $this->prepareParamMarkedValues[$mark] = $value;
+            return $mark;
+        } else {
+            $marks = [];
+            $values = $value;
+            foreach ($values as $v) {
+                $this->prepareParamMarkId++;
+                $mark = ':ppm' . $this->prepareParamMarkId;
+                $this->prepareParamMarkedValues[$mark] = $v;
+
+                $marks[] = $mark;
+            }
+            return $marks;
+        }
+    }
+
+    /**
+     * @param $columnName
+     * @param $type
+     * @param $filterValue
+     * @param \Doctrine\DBAL\Query\QueryBuilder $qb
+     * @return mixed
+     * @throws ErrorException
+     */
     private function processTypeSql($columnName, $type, $filterValue, &$qb)
     {
+
+        $filterPrepareMark = $this->pickPrepareParamMark($filterValue);
+
         $db = $qb->getConnection();
         switch ($type)
         {
             case 'than':
-                $sql = $qb->expr()->gt($columnName, $db->quote($filterValue, \PDO::PARAM_INT));
+                $sql = $qb->expr()->gt($columnName, $filterPrepareMark);
                 break;
             case 'lthan':
-                $sql = $qb->expr()->lt($columnName, $db->quote($filterValue, \PDO::PARAM_INT));
+                $sql = $qb->expr()->lt($columnName, $filterPrepareMark);
                 break;
             case 'nequal':
             case 'tequal':
-                $sql = $qb->expr()->eq($columnName, $db->quote($filterValue));
+                $sql = $qb->expr()->eq($columnName, $filterPrepareMark);
                 break;
             case 'noequal':
-                $sql = $qb->expr()->neq($columnName, $db->quote($filterValue));
+                $sql = $qb->expr()->neq($columnName, $filterPrepareMark);
                 break;
 
             case 'sthan':
-                $sql = $qb->expr()->lte($columnName, $db->quote($filterValue, \PDO::PARAM_INT));
+                $sql = $qb->expr()->lte($columnName, $filterPrepareMark);
                 break;
             case 'bthan':
-                $sql = $qb->expr()->gte($columnName, $db->quote($filterValue, \PDO::PARAM_INT));
+                $sql = $qb->expr()->gte($columnName, $filterPrepareMark);
                 break;
             case 'has':
-                $sql = $qb->expr()->like($columnName, $db->quote('%'.$filterValue.'%', \PDO::PARAM_STR));
+                $sql = $qb->expr()->like($columnName, '%'.$filterPrepareMark.'%');
                 break;
             case 'head':
-                $sql = $qb->expr()->like($columnName, $db->quote($filterValue.'%', \PDO::PARAM_STR));
+                $sql = $qb->expr()->like($columnName, $filterPrepareMark.'%');
                 break;
             case 'foot':
-                $sql = $qb->expr()->like($columnName, $db->quote('%'.$filterValue, \PDO::PARAM_STR));
+                $sql = $qb->expr()->like($columnName, '%'.$filterPrepareMark);
                 break;
             case 'nohas':
-                $sql = $qb->expr()->notlike($columnName, $db->quote('%'.$filterValue.'%', \PDO::PARAM_STR));
+                $sql = $qb->expr()->notlike($columnName, '%'.$filterPrepareMark.'%');
                 break;
             case 'between':
-                $sql = $qb->expr()->andX($qb->expr()->gte($columnName, $db->quote($filterValue[0], \PDO::PARAM_INT)),
-                                         $qb->expr()->lt($columnName, $db->quote($filterValue[1], \PDO::PARAM_INT)));
+                $sql = $qb->expr()->andX($qb->expr()->gte($columnName, $filterPrepareMark[0]),
+                                         $qb->expr()->lt($columnName, $filterPrepareMark[1]));
                 break;
             case 'in':
-                $filterValue = (array)$filterValue;
-                if (empty($filterValue)) throw new InvalidArgumentException("filter column:{$columnName} in type, cannot empty");
-                array_walk($filterValue, function(&$value) use ($qb) {
-                    $value = $qb->getConnection()->quote($value);
-                });
-                $sql = $qb->expr()->in($columnName, $filterValue);
+                $filterPrepareMark = (array)$filterPrepareMark;//if(count($filterValue) == 9){$lk = debug_backtrace();dump($lk);dump($filterValue);die;}
+                if (empty($filterPrepareMark)) throw new InvalidArgumentException("filter column:{$columnName} in type, cannot empty");
+                $sql = $qb->expr()->in($columnName, $filterPrepareMark);
                 break;
             case 'notin':
-                $filterValue = (array)$filterValue;
-                array_walk($filterValue, function(&$value) use ($qb) {
-                    $value = $qb->getConnection()->quote($value);
-                });
-                $sql = $qb->expr()->notin($columnName, $filterValue);
+                $filterPrepareMark = (array)$filterPrepareMark;
+                $sql = $qb->expr()->notin($columnName, $filterPrepareMark);
                 break;
             default:
                 throw new \ErrorException(sprintf('column : %s dbeav filter donnot support type:%s', $columnName, $type));

@@ -274,20 +274,20 @@ abstract class base_db_model implements base_interface_model
      */
     public function delete($filter)
     {
+        /** @var \Doctrine\DBAL\Query\QueryBuilder $qb */
         $qb = $this->database()->createQueryBuilder();
         $qb->delete($this->database()->quoteIdentifier($this->table_name(1)))
-           ->where($this->_filter($filter));
+           ->where($this->_filter($filter))
+           ->setParameters($this->_dbeav_filter->getPrepareParamMarkedValues());
 
         return $qb->execute() ? true : false;
     }
 
     /**
-     * delete
-     *
-     * @param mixed $filter
-     * @param mixed $named_action
-     * @access public
-     * @return void
+     * @param $data
+     * @param $filter
+     * @param null $mustUpdate
+     * @return bool
      */
     public function update($data, $filter, $mustUpdate=null)
     {
@@ -295,7 +295,8 @@ abstract class base_db_model implements base_interface_model
         $prepareUpdateData = $this->prepareUpdateData($data);
         $qb = $this->database()->createQueryBuilder();
         $qb->update($this->database()->quoteIdentifier($this->table_name(1)))
-           ->where($this->_filter($filter));
+           ->where($this->_filter($filter))
+            ->setParameters($this->_dbeav_filter->getPrepareParamMarkedValues());
 
         array_walk($prepareUpdateData, function($value, $key) use (&$qb) {
             $qb->set($key, $qb->createPositionalParameter($value));

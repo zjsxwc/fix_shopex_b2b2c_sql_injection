@@ -23,7 +23,9 @@ class sysitem_search_item  {
         return $qb->select('count('.$itemTableAlias.'.`item_id`) as _count')
             ->from($this->itemTable, $itemTableAlias)
             ->leftJoin($itemTableAlias, $this->itemStatustable, $itemTableStatusAlias, "{$itemTableAlias}.item_id={$itemTableStatusAlias}.item_id")
-            ->where($whereSql)->execute()->fetchColumn();
+            ->where($whereSql)
+            ->setParameters($this->objMdlItem->_dbeav_filter->getPrepareParamMarkedValues())
+            ->execute()->fetchColumn();
     }
 
     //检查传入字段在哪个表中
@@ -72,6 +74,7 @@ class sysitem_search_item  {
 
         $whereSql = $this->__preMysqlSearchFilter($filter);
 
+        /** @var \Doctrine\DBAL\Query\QueryBuilder $qb */
         $qb = app::get('sysitem')->database()->createQueryBuilder();
 
         $itemTableAlias = $qb->getConnection()->quoteIdentifier($this->itemTable);
@@ -87,7 +90,8 @@ class sysitem_search_item  {
             ->setMaxResults($limit)
             ->leftJoin($itemTableAlias, $this->itemStatustable, $itemTableStatusAlias, "{$itemTableAlias}.item_id={$itemTableStatusAlias}.item_id")
             ->leftJoin($itemTableAlias, $this->itemCountTable, $itemTableCountAlias, "{$itemTableAlias}.item_id={$itemTableCountAlias}.item_id")
-            ->where($whereSql);
+            ->where($whereSql)
+            ->setParameters($this->objMdlItem->_dbeav_filter->getPrepareParamMarkedValues());
 
         empty($groupBy) ?: $qb->groupBy($groupBy);
 
@@ -171,16 +175,23 @@ class sysitem_search_item  {
         {
             foreach($filter['shop_cat_id'] as $key=>$value)
             {
+                if (strlen($value) > 5) {
+                    throw new \Exception('shop_cat_id value length too long,'.$value);
+                }
                 $shopCatWhere[] = " (shop_cat_id like '%".$value."%')";
             }
             unset($filter['shop_cat_id']);
             $whereSql = ' AND ('.implode($shopCatWhere,' or ').')';
         }
 
+
         if( isset($filter['approve_status']) && $filter['approve_status'] )
         {
             if(isset($filter['approve_status']) && $filter['approve_status'])
             {
+                if (strlen($filter['approve_status']) > 11) {
+                    throw new \Exception('approve_status value length too long,'.$filter['approve_status']);
+                }
                 $whereSql .= ' AND '.$this->itemStatustable.'.`approve_status` = "'.str_replace('"','\\"',$filter['approve_status']).'"';
             }
             unset($filter['approve_status']);
