@@ -242,7 +242,7 @@ abstract class base_db_model implements base_interface_model
         $qb->insert($this->database()->quoteIdentifier($this->table_name(1)));
 
         array_walk($prepareUpdateData, function($value, $key) use (&$qb) {
-            $qb->setValue($key, $qb->createPositionalParameter($value));
+            $qb->setValue($key, $qb->createNamedParameter($value));
         });
         
         try {
@@ -301,7 +301,7 @@ abstract class base_db_model implements base_interface_model
             ->setParameters($this->dbeav_filter->getPrepareParamMarkedValues());
 
         array_walk($prepareUpdateData, function($value, $key) use (&$qb) {
-            $qb->set($key, $qb->createPositionalParameter($value));
+            $qb->set($key, $qb->createNamedParameter($value));
         });
         $stmt = $qb->execute();
         
