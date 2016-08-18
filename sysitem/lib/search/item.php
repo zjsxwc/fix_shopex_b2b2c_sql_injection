@@ -223,6 +223,7 @@ class sysitem_search_item  {
         $qb->select('item_id')
             ->from('sysitem_item_nature_props')
             ->where($objMdlItemNatureProps->_filter($propIndexFilter))
+            ->setParameters($objMdlItemNatureProps->dbeav_filter->getPrepareParamMarkedValues())
             ->groupBy('item_id')
             ->having('count(item_id)>='.count($count));
 
