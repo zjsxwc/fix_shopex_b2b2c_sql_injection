@@ -6,4 +6,6 @@ shopex b2b2c 虽然使用了doctrine框架，但没有使用Mysql的prepare-bind
 
 ##使用方式
 
-在二开方式替换目录
+在二开目录下直接替换对应目录
+
+##欢迎大家clone来测试，报告可能的问题
